@@ -21,7 +21,15 @@ after renaming classes to remove stale compiled classes and test reports.
 
 This is a single-module Maven Java application that converts typed 3-by-5
 character arrays into individual SVG glyphs inspired by MUNI Metro Breda train
-signs. Font assembly and Pebble resource generation are outside its current scope.
+signs. `scripts/build_font.py` separately assembles the reviewed SVGs into a
+TrueType font using FontForge's Python API; Pebble resource generation is outside
+the current scope. See README.md for FontForge invocation and fixed metrics.
+After `mvn verify`, run `fontforge -lang=py -script scripts/test_build_font.py`
+for the real-font integration tests (on Windows, use FontForge's `fontforge.bat`
+wrapper). The script derives its repertoire from all canonical Unicode-named
+SVGs in the input directory, including stale files; keep that directory clean.
+ASCII lowercase aliases are derived from uppercase artwork unless an explicit
+lowercase SVG is present.
 
 The application entry point is
 `com.willivolt.munimetro.fontcreator.FontCreator`. The Maven JAR plugin references
