@@ -21,7 +21,7 @@ class FontCreatorTest {
     @Test
     void generatesAllGlyphsAndCanRegenerateThem() throws Exception {
         Path directory = temporary.resolve("glyphs");
-        assertEquals(37, FontCreator.generate(directory));
+        assertEquals(56, FontCreator.generate(directory));
         var expected = GlyphLibrary.glyphs().stream().map(GlyphDefinition::filename).collect(Collectors.toSet());
         try (var files = Files.list(directory)) {
             assertEquals(expected, files.map(path -> path.getFileName().toString()).collect(Collectors.toSet()));
@@ -29,7 +29,7 @@ class FontCreatorTest {
         String original = Files.readString(directory.resolve("U0041.svg"));
         Files.writeString(directory.resolve("U0041.svg"), "old");
         Path unrelated = Files.writeString(directory.resolve("notes.txt"), "keep");
-        assertEquals(37, FontCreator.generate(directory));
+        assertEquals(56, FontCreator.generate(directory));
         assertEquals(original, Files.readString(directory.resolve("U0041.svg")));
         assertEquals("keep", Files.readString(unrelated));
     }
@@ -39,10 +39,29 @@ class FontCreatorTest {
         Path directory = temporary.resolve("review glyphs");
         Result result = invoke(directory.toString());
         assertEquals(0, result.exitCode(), result.output());
-        assertTrue(result.output().contains("Generated 37 SVG glyphs in " + directory.toAbsolutePath().normalize()));
+        assertTrue(result.output().contains("Generated 56 SVG glyphs in " + directory.toAbsolutePath().normalize()));
+        assertTrue(Files.exists(directory.resolve("U007C.svg")));
+        assertTrue(Files.exists(directory.resolve("U0028.svg")));
+        assertTrue(Files.exists(directory.resolve("U0029.svg")));
+        assertTrue(Files.exists(directory.resolve("U005C.svg")));
+        assertTrue(Files.exists(directory.resolve("U00F7.svg")));
+        assertTrue(Files.exists(directory.resolve("U0021.svg")));
+        assertTrue(Files.exists(directory.resolve("U003F.svg")));
+        assertTrue(Files.exists(directory.resolve("U0027.svg")));
+        assertTrue(Files.exists(directory.resolve("U0022.svg")));
+        assertTrue(Files.exists(directory.resolve("U005F.svg")));
+        assertTrue(Files.exists(directory.resolve("U002C.svg")));
+        assertTrue(Files.exists(directory.resolve("U003B.svg")));
+        assertTrue(Files.exists(directory.resolve("U002A.svg")));
+        assertTrue(Files.exists(directory.resolve("U002B.svg")));
+        assertTrue(Files.exists(directory.resolve("U003D.svg")));
         assertTrue(Files.exists(directory.resolve("U003A.svg")));
         assertTrue(Files.exists(directory.resolve("U0020.svg")));
         assertTrue(Files.exists(directory.resolve("U002E.svg")));
+        assertTrue(Files.exists(directory.resolve("U004B.svg")));
+        assertTrue(Files.exists(directory.resolve("U0051.svg")));
+        assertTrue(Files.exists(directory.resolve("U0058.svg")));
+        assertTrue(Files.exists(directory.resolve("U005A.svg")));
     }
 
     @Test

@@ -53,7 +53,7 @@ class BuildFontTest(unittest.TestCase):
     def test_real_generated_font_metrics_mappings_and_positions(self):
         result = self.run_cli(self.inputs, self.output)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertIn("from 37 SVG glyphs", result.stdout)
+        self.assertIn("from 56 SVG glyphs", result.stdout)
         data = self.output.read_bytes()
         self.assertEqual(b"\x00\x01\x00\x00", data[:4])
         table_count = struct.unpack_from(">H", data, 4)[0]
@@ -89,15 +89,30 @@ class BuildFontTest(unittest.TestCase):
         for character in "A0":
             self.assertEqual((40, 0, 480, 740), font[ord(character)].boundingBox())
         self.assertEqual((190, 0, 330, 740), font[ord("I")].boundingBox())
+        self.assertEqual((190, 0, 330, 740), font[ord("|")].boundingBox())
         self.assertEqual((190, 0, 330, 140), font[ord(".")].boundingBox())
         self.assertEqual((190, 150, 330, 590), font[ord(":")].boundingBox())
+        self.assertEqual((190, 0, 330, 590), font[ord(";")].boundingBox())
+        self.assertEqual((190, 0, 330, 290), font[ord(",")].boundingBox())
+        self.assertEqual((190, 450, 330, 740), font[ord("'")].boundingBox())
+        self.assertEqual((190, 450, 480, 740), font[ord('"')].boundingBox())
+        self.assertEqual((40, 0, 480, 140), font[ord("_")].boundingBox())
+        self.assertEqual((190, 0, 330, 740), font[ord("!")].boundingBox())
+        self.assertEqual((40, 0, 480, 740), font[ord("?")].boundingBox())
+        self.assertEqual((40, 0, 480, 740), font[0x00F7].boundingBox())
         self.assertEqual((40, 300, 480, 440), font[ord("-")].boundingBox())
+        for character in "+=":
+            self.assertEqual((40, 150, 480, 590), font[ord(character)].boundingBox())
+        self.assertEqual((40, 300, 480, 740), font[ord("*")].boundingBox())
         self.assertEqual((40, 0, 480, 590), font[ord("/")].boundingBox())
+        self.assertEqual((40, 0, 480, 590), font[ord("\\")].boundingBox())
+        self.assertEqual((190, 0, 480, 740), font[ord("(")].boundingBox())
+        self.assertEqual((40, 0, 330, 740), font[ord(")")].boundingBox())
         self.assertTrue(len(font[".notdef"].foreground))
         self.assertEqual(0, font[".notdef"].validate(True))
         self.assertEqual(0, font[".null"].width)
         self.assertEqual(520, font["nonmarkingreturn"].width)
-        for text in ("10:45 AM", "FRI 10/29", "2026-10-29", "1.0", "Fri 10:45 am"):
+        for text in ("10:45 AM", "FRI 10/29", "2026-10-29", "1.0", "Fri 10:45 am", "1+1=2", "2*3=6"):
             self.assertEqual(520 * len(text), sum(font[ord(char)].width for char in text))
         # Adjacent full-width glyphs have 80 units between their visible edges.
         self.assertEqual(80, 520 + font[ord("A")].boundingBox()[0]
@@ -143,6 +158,7 @@ class BuildFontTest(unittest.TestCase):
             self.assertNotIn(codepoint, font)
 
     def test_new_artwork_and_supplementary_unicode_are_included(self):
+        (self.inputs / "U005A.svg").unlink()
         shutil.copyfile(self.inputs / "U0041.svg", self.inputs / "U005A.svg")
         shutil.copyfile(self.inputs / "U0041.svg", self.inputs / "U1F680.svg")
         result = self.run_cli(self.inputs, self.output)
@@ -181,7 +197,7 @@ class BuildFontTest(unittest.TestCase):
                     path.unlink()
 
     def test_invalid_filenames_are_rejected(self):
-        for name in ("A.svg", "U005a.svg", "U005A.SVG", "U00003A.svg", "U110000.svg", "UD800.svg"):
+        for name in ("A.svg", "U005b.svg", "U005B.SVG", "U00003A.svg", "U110000.svg", "UD800.svg"):
             with self.subTest(name=name):
                 extra = self.inputs / name
                 extra.write_text("<svg/>", encoding="utf-8")
@@ -192,7 +208,7 @@ class BuildFontTest(unittest.TestCase):
 
     def test_non_svg_files_are_ignored(self):
         (self.inputs / "notes.txt").write_text("not artwork", encoding="utf-8")
-        self.assertEqual(37, len(build_font.read_inputs(self.inputs)))
+        self.assertEqual(56, len(build_font.read_inputs(self.inputs)))
 
     def test_malformed_svg(self):
         (self.inputs / "U0041.svg").write_text("<svg", encoding="utf-8")
