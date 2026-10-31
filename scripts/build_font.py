@@ -60,10 +60,22 @@ def read_inputs(directory):
         if (root.tag != SVG_NS + "svg" or dimensions != (CANVAS_WIDTH, CANVAS_HEIGHT)
                 or viewbox != (0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)):
             raise BuildError(canvas_error)
-        if codepoint == 32 and any(
-                element.tag not in (SVG_NS + "svg", SVG_NS + "g") for element in root.iter()):
+        if codepoint == 32 and contains_drawing_elements(root):
             raise BuildError(f"{path}: space must contain no outlines")
     return inputs
+
+
+def contains_drawing_elements(element):
+    non_rendering = {"title", "desc", "metadata"}
+    for child in element:
+        local_name = child.tag.rsplit("}", 1)[-1]
+        if local_name in non_rendering:
+            continue
+        if child.tag != SVG_NS + "g":
+            return True
+        if contains_drawing_elements(child):
+            return True
+    return False
 
 
 def configure_font(font):

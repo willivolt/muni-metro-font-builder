@@ -208,6 +208,24 @@ class BuildFontTest(unittest.TestCase):
         shutil.copyfile(self.inputs / "U0041.svg", self.inputs / "U0020.svg")
         self.assert_cli_failure("space must contain no outlines")
 
+    def test_space_allows_non_rendering_metadata(self):
+        path = self.inputs / "U0020.svg"
+        svg = path.read_text(encoding="utf-8").replace(
+            '  <g fill="black" stroke="none">',
+            '  <title>Blank space</title>\n'
+            '  <desc>A glyph with descriptive metadata.</desc>\n'
+            '  <metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+            '<rdf:Description>Editor metadata</rdf:Description></rdf:RDF></metadata>\n'
+            '  <g fill="black" stroke="none">')
+        path.write_text(svg, encoding="utf-8")
+        self.assertIn(32, build_font.read_inputs(self.inputs))
+        result = self.run_cli(self.inputs, self.output)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        font = fontforge.open(str(self.output))
+        self.addCleanup(font.close)
+        self.assertEqual(520, font[32].width)
+        self.assertEqual(0, len(font[32].foreground))
+
     def test_empty_non_space_import(self):
         shutil.copyfile(self.inputs / "U0020.svg", self.inputs / "U0041.svg")
         self.assert_cli_failure("import produced no outlines")
