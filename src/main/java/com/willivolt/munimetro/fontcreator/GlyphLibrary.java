@@ -1,7 +1,6 @@
 package com.willivolt.munimetro.fontcreator;
 
 import static com.willivolt.munimetro.fontcreator.CellShape.*;
-import static com.willivolt.munimetro.fontcreator.CellPattern.combine;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public final class GlyphLibrary {
                 new GlyphDefinition('3',
                         ARC_BR, BLOCK, ARC_BL,
                         EMPTY,  EMPTY, BLOCK,
-                        EMPTY,  BLOCK, combine(TRI_Q_UP, TRI_Q_DOWN, TRI_Q_RIGHT),
+                        EMPTY,  BLOCK, NOTCH_LEFT,
                         EMPTY,  EMPTY, BLOCK,
                         ARC_TR, BLOCK, ARC_TL),
                 new GlyphDefinition('4',
@@ -62,7 +61,7 @@ public final class GlyphLibrary {
                 new GlyphDefinition('8',
                         ARC_BR, BLOCK, ARC_BL,
                         BLOCK,  EMPTY, BLOCK,
-                        combine(TRI_Q_UP, TRI_Q_DOWN, TRI_Q_LEFT), BLOCK, combine(TRI_Q_UP, TRI_Q_DOWN, TRI_Q_RIGHT),
+                        NOTCH_RIGHT, BLOCK, NOTCH_LEFT,
                         BLOCK,  EMPTY, BLOCK,
                         ARC_TR, BLOCK, ARC_TL),
                 new GlyphDefinition('9',
@@ -110,7 +109,7 @@ public final class GlyphLibrary {
                 new GlyphDefinition('B',
                         BLOCK, BLOCK, ARC_BL,
                         BLOCK, EMPTY, BLOCK,
-                        BLOCK, BLOCK, combine(TRI_Q_UP, TRI_Q_DOWN, TRI_Q_RIGHT),
+                        BLOCK, BLOCK, NOTCH_LEFT,
                         BLOCK, EMPTY, BLOCK,
                         BLOCK, BLOCK, ARC_TL),
                 new GlyphDefinition('C',
@@ -169,7 +168,7 @@ public final class GlyphLibrary {
                         BLOCK, BLOCK, BLOCK),
                 new GlyphDefinition('M',
                         BLOCK, EMPTY,                                         BLOCK,
-                        BLOCK, combine(TRI_Q_UP, TRI_Q_LEFT, TRI_Q_RIGHT),      BLOCK,
+                        BLOCK, NOTCH_DOWN, BLOCK,
                         BLOCK, TRI_Q_DOWN,                                    BLOCK,
                         BLOCK, EMPTY,                                         BLOCK,
                         BLOCK, EMPTY,                                         BLOCK),
@@ -194,7 +193,7 @@ public final class GlyphLibrary {
                 new GlyphDefinition('R',
                         BLOCK, BLOCK,    ARC_BL,
                         BLOCK, EMPTY,    BLOCK,
-                        BLOCK, BLOCK,    combine(TRI_Q_UP, TRI_Q_DOWN, TRI_Q_RIGHT),
+                        BLOCK, BLOCK,    NOTCH_LEFT,
                         BLOCK, EMPTY,    BLOCK,
                         BLOCK, EMPTY,    BLOCK),
                 new GlyphDefinition('S',
@@ -219,18 +218,18 @@ public final class GlyphLibrary {
                         BLOCK,        EMPTY, BLOCK,
                         BLOCK,        EMPTY, BLOCK,
                         BLOCK,        EMPTY, BLOCK,
-                        TRI_2V_TOP_R, combine(TRI_Q_UP, TRI_Q_LEFT, TRI_Q_RIGHT), TRI_2V_TOP_L,
+                        TRI_2V_TOP_R, NOTCH_DOWN, TRI_2V_TOP_L,
                         TRI_2V_BOT_R, BLOCK, TRI_2V_BOT_L),
                 new GlyphDefinition('W',
                         BLOCK,  EMPTY, BLOCK,
                         BLOCK,  EMPTY, BLOCK,
                         BLOCK,  TRI_Q_UP, BLOCK,
-                        BLOCK,  combine(TRI_Q_DOWN, TRI_Q_LEFT, TRI_Q_RIGHT), BLOCK,
+                        BLOCK,  NOTCH_UP, BLOCK,
                         ARC_TR, EMPTY, ARC_TL),
                 new GlyphDefinition('Y',
                         BLOCK,    EMPTY, BLOCK,
                         BLOCK,    EMPTY, BLOCK,
-                        TRI_H_TR, combine(TRI_Q_UP, TRI_Q_LEFT, TRI_Q_RIGHT), TRI_H_TL,
+                        TRI_H_TR, NOTCH_DOWN, TRI_H_TL,
                         EMPTY,    BLOCK, EMPTY,
                         EMPTY,    BLOCK, EMPTY));
     }

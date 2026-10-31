@@ -70,14 +70,14 @@ class GlyphLibraryTest {
     }
 
     @Test
-    void yUsesLoweredArmsAndTheInverseDownTriangleInCell8() {
+    void yUsesLoweredArmsAndADownwardNotchInCell8() {
         GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
                 .filter(candidate -> candidate.character() == 'Y').findFirst().orElseThrow();
         assertEquals(List.of(
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.TRI_H_TR,
-                CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_LEFT, CellShape.TRI_Q_RIGHT),
+                CellShape.NOTCH_DOWN,
                 CellShape.TRI_H_TL,
                 CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
                 CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY), glyph.cells());
@@ -92,7 +92,7 @@ class GlyphLibraryTest {
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.TRI_2V_TOP_R,
-                CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_LEFT, CellShape.TRI_Q_RIGHT),
+                CellShape.NOTCH_DOWN,
                 CellShape.TRI_2V_TOP_L,
                 CellShape.TRI_2V_BOT_R, CellShape.BLOCK, CellShape.TRI_2V_BOT_L), glyph.cells());
     }
@@ -106,34 +106,34 @@ class GlyphLibraryTest {
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.BLOCK, CellShape.TRI_Q_UP, CellShape.BLOCK,
                 CellShape.BLOCK,
-                CellPattern.combine(CellShape.TRI_Q_DOWN, CellShape.TRI_Q_LEFT, CellShape.TRI_Q_RIGHT),
+                CellShape.NOTCH_UP,
                 CellShape.BLOCK,
                 CellShape.ARC_TR, CellShape.EMPTY, CellShape.ARC_TL), glyph.cells());
     }
 
     @Test
-    void rUsesTheInverseLeftTriangleAndBlankCell11() {
+    void rUsesALeftwardNotchAndBlankCell11() {
         GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
                 .filter(candidate -> candidate.character() == 'R').findFirst().orElseThrow();
         assertEquals(List.of(
                 CellShape.BLOCK, CellShape.BLOCK, CellShape.ARC_BL,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.BLOCK, CellShape.BLOCK,
-                CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_DOWN, CellShape.TRI_Q_RIGHT),
+                CellShape.NOTCH_LEFT,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK), glyph.cells());
     }
 
     @Test
-    void eightUsesInverseQuarterTrianglesAtBothSidesOfTheWaist() {
+    void eightUsesNotchesAtBothSidesOfTheWaist() {
         GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
                 .filter(candidate -> candidate.character() == '8').findFirst().orElseThrow();
         assertEquals(List.of(
                 CellShape.ARC_BR, CellShape.BLOCK, CellShape.ARC_BL,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
-                CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_DOWN, CellShape.TRI_Q_LEFT),
+                CellShape.NOTCH_RIGHT,
                 CellShape.BLOCK,
-                CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_DOWN, CellShape.TRI_Q_RIGHT),
+                CellShape.NOTCH_LEFT,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.ARC_TR, CellShape.BLOCK, CellShape.ARC_TL), glyph.cells());
     }
@@ -154,24 +154,23 @@ class GlyphLibraryTest {
     }
 
     @Test
-    void threeUsesRoundedCornersAndTheInverseLeftTriangleInCell9() {
+    void threeUsesRoundedCornersAndALeftwardNotchInCell9() {
         GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
                 .filter(candidate -> candidate.character() == '3').findFirst().orElseThrow();
         assertEquals(List.of(
                 CellShape.ARC_BR, CellShape.BLOCK, CellShape.ARC_BL,
                 CellShape.EMPTY, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.EMPTY, CellShape.BLOCK,
-                CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_DOWN, CellShape.TRI_Q_RIGHT),
+                CellShape.NOTCH_LEFT,
                 CellShape.EMPTY, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.ARC_TR, CellShape.BLOCK, CellShape.ARC_TL), glyph.cells());
     }
 
     @Test
-    void bUsesTheInverseLeftTriangleInCell9() {
+    void bUsesALeftwardNotchInCell9() {
         GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
                 .filter(candidate -> candidate.character() == 'B').findFirst().orElseThrow();
-        assertEquals(CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_DOWN, CellShape.TRI_Q_RIGHT),
-                glyph.cells().get(8));
+        assertEquals(CellShape.NOTCH_LEFT, glyph.cells().get(8));
     }
 
     @ParameterizedTest
@@ -216,7 +215,7 @@ class GlyphLibraryTest {
                 .filter(candidate -> candidate.character() == 'M').findFirst().orElseThrow();
         for (int cell = 1; cell <= 15; cell++) {
             CellPattern expected = switch (cell) {
-                case 5 -> CellPattern.combine(CellShape.TRI_Q_UP, CellShape.TRI_Q_LEFT, CellShape.TRI_Q_RIGHT);
+                case 5 -> CellShape.NOTCH_DOWN;
                 case 8 -> CellShape.TRI_Q_DOWN;
                 case 2, 11, 14 -> CellShape.EMPTY;
                 default -> CellShape.BLOCK;

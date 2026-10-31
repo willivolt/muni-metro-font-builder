@@ -5,6 +5,7 @@ public enum CellShape implements CellPattern {
     ARC_TL, ARC_TR, ARC_BL, ARC_BR,
     TRI_H_TL, TRI_H_TR, TRI_H_BL, TRI_H_BR,
     TRI_Q_UP, TRI_Q_DOWN, TRI_Q_LEFT, TRI_Q_RIGHT,
+    NOTCH_UP, NOTCH_DOWN, NOTCH_LEFT, NOTCH_RIGHT,
     TRI_2V_TOP_L, TRI_2V_TOP_R, TRI_2V_BOT_L, TRI_2V_BOT_R;
 
     public String svg(GridSpec grid) {
@@ -29,6 +30,10 @@ public enum CellShape implements CellPattern {
             case TRI_Q_DOWN -> polygon(0, 0, s, 0, mid, mid);
             case TRI_Q_LEFT -> polygon(s, 0, mid, mid, s, s);
             case TRI_Q_RIGHT -> polygon(0, 0, mid, mid, 0, s);
+            case NOTCH_UP -> polygon(0, 0, s, 0, s, s, mid, mid, 0, s);
+            case NOTCH_DOWN -> polygon(0, 0, mid, mid, s, 0, s, s, 0, s);
+            case NOTCH_LEFT -> polygon(0, 0, s, 0, mid, mid, s, s, 0, s);
+            case NOTCH_RIGHT -> polygon(0, 0, s, 0, s, s, 0, s, mid, mid);
             case TRI_2V_TOP_L -> polygon(0, 0, s, 0, topWidth, s, 0, s);
             case TRI_2V_TOP_R -> polygon(0, 0, s, 0, s, s, bottomWidth, s);
             case TRI_2V_BOT_L -> polygon(0, 0, bottomWidth, 0, 0, s);

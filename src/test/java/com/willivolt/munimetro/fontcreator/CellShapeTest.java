@@ -2,6 +2,9 @@ package com.willivolt.munimetro.fontcreator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.awt.geom.Area;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -17,7 +20,7 @@ class CellShapeTest {
     void everyShapeProducesValidSvg(CellShape shape) throws Exception {
         Element svg = SvgTestSupport.shape(shape, GridSpec.DEFAULT);
         assertEquals(shape == CellShape.EMPTY ? 0 : 1, svg.getChildNodes().getLength());
-        assertEquals(18, CellShape.values().length);
+        assertEquals(22, CellShape.values().length);
         if (shape == CellShape.BLOCK) {
             Element rect = (Element) svg.getFirstChild();
             assertEquals("140.0", rect.getAttribute("width"));
@@ -42,7 +45,7 @@ class CellShapeTest {
 
     @ParameterizedTest
     @MethodSource("trianglePoints")
-    void trianglesUseTheDocumentedFilledCornerOrPointDirection(CellShape shape, String expected) throws Exception {
+    void trianglesAndNotchesUseTheDocumentedDirection(CellShape shape, String expected) throws Exception {
         Element polygon = (Element) SvgTestSupport.shape(shape, GridSpec.DEFAULT).getFirstChild();
         assertEquals(expected, polygon.getAttribute("points"));
     }
@@ -56,7 +59,31 @@ class CellShapeTest {
                 Arguments.of(CellShape.TRI_Q_UP, "0.0,140.0 70.0,70.0 140.0,140.0"),
                 Arguments.of(CellShape.TRI_Q_DOWN, "0.0,0.0 140.0,0.0 70.0,70.0"),
                 Arguments.of(CellShape.TRI_Q_LEFT, "140.0,0.0 70.0,70.0 140.0,140.0"),
-                Arguments.of(CellShape.TRI_Q_RIGHT, "0.0,0.0 70.0,70.0 0.0,140.0"));
+                Arguments.of(CellShape.TRI_Q_RIGHT, "0.0,0.0 70.0,70.0 0.0,140.0"),
+                Arguments.of(CellShape.NOTCH_UP, "0.0,0.0 140.0,0.0 140.0,140.0 70.0,70.0 0.0,140.0"),
+                Arguments.of(CellShape.NOTCH_DOWN, "0.0,0.0 70.0,70.0 140.0,0.0 140.0,140.0 0.0,140.0"),
+                Arguments.of(CellShape.NOTCH_LEFT, "0.0,0.0 140.0,0.0 70.0,70.0 140.0,140.0 0.0,140.0"),
+                Arguments.of(CellShape.NOTCH_RIGHT, "0.0,0.0 140.0,0.0 140.0,140.0 0.0,140.0 70.0,70.0"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("notchComplements")
+    void notchesFillTheCellExceptForTheirNamedQuarterTriangle(CellShape notch, CellShape triangle) throws Exception {
+        for (GridSpec grid : new GridSpec[]{GridSpec.DEFAULT, new GridSpec(4, 1), new GridSpec(140.25, 10.5)}) {
+            Area actual = area(notch, grid);
+            Area expected = new Area(new Rectangle2D.Double(0, 0, grid.cellSize(), grid.cellSize()));
+            expected.subtract(area(triangle, grid));
+            expected.exclusiveOr(actual);
+            assertTrue(expected.isEmpty(), notch + " must equal the cell minus " + triangle + ".");
+        }
+    }
+
+    static Stream<Arguments> notchComplements() {
+        return Stream.of(
+                Arguments.of(CellShape.NOTCH_UP, CellShape.TRI_Q_UP),
+                Arguments.of(CellShape.NOTCH_DOWN, CellShape.TRI_Q_DOWN),
+                Arguments.of(CellShape.NOTCH_LEFT, CellShape.TRI_Q_LEFT),
+                Arguments.of(CellShape.NOTCH_RIGHT, CellShape.TRI_Q_RIGHT));
     }
 
     @ParameterizedTest
@@ -105,5 +132,16 @@ class CellShapeTest {
             assertTrue(Arrays.stream(right).anyMatch(other ->
                     Math.abs(size - point[0] - other[0]) < 1e-12 && point[1] == other[1]));
         }
+    }
+
+    private static Area area(CellShape shape, GridSpec grid) throws Exception {
+        double[][] points = SvgTestSupport.points(shape, grid);
+        Path2D.Double path = new Path2D.Double();
+        path.moveTo(points[0][0], points[0][1]);
+        for (int i = 1; i < points.length; i++) {
+            path.lineTo(points[i][0], points[i][1]);
+        }
+        path.closePath();
+        return new Area(path);
     }
 }

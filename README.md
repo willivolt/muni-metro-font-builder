@@ -133,22 +133,18 @@ new GlyphDefinition('I',
         EMPTY, BLOCK, EMPTY)
 ```
 
-Use `combine(...)` to draw multiple primitives in the same cell. With
-`import static com.willivolt.munimetro.fontcreator.CellPattern.combine;`,
-the inverse of `TRI_Q_DOWN` is:
+Use `NOTCH_DOWN` for a cell filled except for the downward-pointing triangle
+cut from its top edge. `NOTCH_UP`, `NOTCH_LEFT`, and `NOTCH_RIGHT` follow the
+same convention: the suffix names the missing triangle's tip direction.
+`combine(...)` remains available for drawing other multiple-primitive patterns.
 
-```java
-combine(TRI_Q_UP, TRI_Q_LEFT, TRI_Q_RIGHT)
-```
+A combination occupies one array entry, just like a single primitive; it adds
+the filled regions without erasing any of them. Use `EMPTY` for a blank cell
+rather than calling `combine()` without shapes.
 
-This fills the cell except for a downward-pointing triangular notch from the
-top edge. A combination occupies one array entry, just like a single primitive;
-it adds the filled regions without erasing any of them. Use `EMPTY` for a blank
-cell rather than calling `combine()` without shapes.
-
-For `M`, columns 1 and 3 are solid `BLOCK` cells, cell 5 uses this combination,
-and cell 8 uses `TRI_Q_DOWN`. Cell numbers in artwork discussions are 1-based,
-read left-to-right and top-to-bottom; Java list indices remain 0-based.
+For `M`, columns 1 and 3 are solid `BLOCK` cells, cell 5 uses `NOTCH_DOWN`, and
+cell 8 uses `TRI_Q_DOWN`. Cell numbers in artwork discussions are 1-based, read
+left-to-right and top-to-bottom; Java list indices remain 0-based.
 
 Change the entries, rebuild with `mvn verify`, rerun the JAR, and refresh the SVG
 preview. The initial arrays are starting artwork for visual refinement, not final
@@ -164,6 +160,7 @@ SVGs have black fills, no strokes, and transparent backgrounds.
 | `ARC_TL`, `ARC_TR`, `ARC_BL`, `ARC_BR` | Quarter disks centered at the named corner, with radius equal to the cell size |
 | `TRI_H_TL`, `TRI_H_TR`, `TRI_H_BL`, `TRI_H_BR` | Half-square triangles filling the named corner |
 | `TRI_Q_UP`, `TRI_Q_DOWN`, `TRI_Q_LEFT`, `TRI_Q_RIGHT` | Quarter-square triangles with the center tip pointing in the named direction |
+| `NOTCH_UP`, `NOTCH_DOWN`, `NOTCH_LEFT`, `NOTCH_RIGHT` | Three-quarter-cell polygons with a quarter-triangle notch whose tip points in the named direction |
 | `TRI_2V_TOP_L`, `TRI_2V_TOP_R` | Upper trapezoids of a two-cell vertical triangle with a left or right vertical edge |
 | `TRI_2V_BOT_L`, `TRI_2V_BOT_R` | Lower triangle fragments with a bottom-left or bottom-right point |
 

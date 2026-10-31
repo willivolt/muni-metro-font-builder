@@ -60,6 +60,18 @@ class SvgGlyphWriterTest {
     }
 
     @Test
+    void rendersNotchesAsSingleNamedPolygons() throws Exception {
+        CellPattern[] cells = new CellPattern[15];
+        Arrays.fill(cells, CellShape.EMPTY);
+        cells[4] = CellShape.NOTCH_DOWN;
+        Element svg = SvgTestSupport.parse(new SvgGlyphWriter(GridSpec.DEFAULT)
+                .render(new GlyphDefinition('M', cells)));
+        Element notchCell = (Element) svg.getElementsByTagName("g").item(1);
+        assertCell(notchCell, "4", "NOTCH_DOWN", "translate(150.0 150.0)");
+        assertEquals(1, notchCell.getElementsByTagName("polygon").getLength());
+    }
+
+    @Test
     void supportsBlankGlyphsAndConfiguredGridSizes() throws Exception {
         Element svg = SvgTestSupport.parse(new SvgGlyphWriter(new GridSpec(4, 1))
                 .render(new GlyphDefinition(' ', java.util.Collections.nCopies(15, CellShape.EMPTY))));

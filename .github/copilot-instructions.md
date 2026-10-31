@@ -62,8 +62,11 @@ dependency; the application currently has no runtime dependencies.
   generated SVG `data-cell` attributes remain 0-based.
 - Default cells are 140 units with 10-unit gaps, producing a 440-by-740 canvas.
   ARC suffixes name the circle center; TRI_H suffixes name the filled corner;
-  TRI_Q suffixes name the tip direction. A rounded outer corner uses the
-  opposite ARC center (for example, top-left rounding uses ARC_BR).
+  TRI_Q suffixes name the tip direction; NOTCH suffixes name the missing
+  triangle's tip direction (for example, NOTCH_DOWN cuts a downward-pointing
+  triangle from the top edge). Use a notch primitive instead of combining its
+  three quarter-triangle regions. A rounded outer corner uses the opposite ARC
+  center (for example, top-left rounding uses ARC_BR).
   Quarter circles belong only in cells 1, 3, 13, and 15 (1-based); remaining
   interior arcs in seed artwork need individual review, not blind replacement.
   Two-cell fragments must use a shared
