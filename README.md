@@ -15,10 +15,10 @@ mvn verify
 java -jar target/muni-metro-font-builder-1.0-SNAPSHOT.jar
 ```
 
-This generates 37 individual SVGs under `target/glyphs`. Open them in a browser
-or an SVG preview in VS Code to inspect the shapes. The initial library contains
-digits `0` through `9`, a blank space, punctuation `: / - .`, and letters
-`A B C D E F G H I J L M N O P R S T U V W Y`.
+This generates 56 individual SVGs under `target/glyphs`. Open them in a browser
+or an SVG preview in VS Code to inspect the shapes. The library contains digits
+`0` through `9`, a blank space, punctuation and symbols `: ; / \ - + * = . , ' " _ ! ? ( ) |`,
+the division sign (U+00F7), and all uppercase letters `A` through `Z`.
 
 To keep review files outside Maven's build directory, pass an output directory:
 
@@ -170,9 +170,9 @@ and bottom-right uses `ARC_TL`. For example, the bottom of `U` is
 `ARC_TR, BLOCK, ARC_TL`, not `ARC_BL, BLOCK, ARC_BR`.
 
 The artwork convention is to use quarter circles only in the four corner
-cells: 1, 3, 13, and 15 (1-based). Interior cells should use blocks or triangles,
-including combinations where needed. Some initial glyphs still have interior
-arcs pending individual artwork review.
+cells: 1, 3, 13, and 15 (1-based). The reviewed parentheses are an exception:
+their narrower rounded ends use cells 2 and 14. Other interior cells should use
+blocks or triangles, including combinations where needed.
 
 Two-cell fragments follow a shared diagonal across the intervening gap. For a
 continuous triangle, place the matching top and bottom fragments in adjacent

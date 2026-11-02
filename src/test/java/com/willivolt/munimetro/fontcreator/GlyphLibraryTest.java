@@ -12,10 +12,10 @@ class GlyphLibraryTest {
     @Test
     void containsExactlyTheRequestedCharactersInStableOrder() {
         List<GlyphDefinition> glyphs = GlyphLibrary.glyphs();
-        assertEquals(37, glyphs.size());
-        assertEquals("0123456789:/- .ABCDEFGHIJLMNOPRSTUVWY",
+        assertEquals(56, glyphs.size());
+        assertEquals("0123456789:;/\\-+*= .,'\"_!?\u00F7()|ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                 glyphs.stream().map(glyph -> String.valueOf(glyph.character())).collect(Collectors.joining()));
-        assertEquals(37, glyphs.stream().map(GlyphDefinition::filename).distinct().count());
+        assertEquals(56, glyphs.stream().map(GlyphDefinition::filename).distinct().count());
         for (GlyphDefinition glyph : glyphs) {
             assertEquals(15, glyph.cells().size());
             assertTrue(glyph.cells().stream().allMatch(java.util.Objects::nonNull));
@@ -28,12 +28,12 @@ class GlyphLibraryTest {
     @ParameterizedTest
     @CsvSource({
             "0,1,ARC_BR", "0,3,ARC_BL", "0,13,ARC_TR", "0,15,ARC_TL",
-            "2,1,ARC_BR", "2,3,ARC_BL", "2,7,ARC_BR", "2,9,ARC_TL",
+            "2,1,ARC_BR", "2,3,ARC_BL",
             "3,1,ARC_BR", "3,3,ARC_BL", "3,13,ARC_TR", "3,15,ARC_TL",
             "5,13,ARC_TR", "5,15,ARC_TL",
             "6,1,ARC_BR", "6,3,ARC_BL", "6,13,ARC_TR", "6,15,ARC_TL",
             "8,1,ARC_BR", "8,3,ARC_BL", "8,13,ARC_TR", "8,15,ARC_TL",
-            "9,1,ARC_BR", "9,3,ARC_BL", "9,7,ARC_TR", "9,13,ARC_TR", "9,15,ARC_TL",
+            "9,1,ARC_BR", "9,3,ARC_BL", "9,13,ARC_TR", "9,15,ARC_TL",
             "A,1,ARC_BR", "A,3,ARC_BL",
             "B,3,ARC_BL", "B,15,ARC_TL",
             "C,1,ARC_BR", "C,3,ARC_BL", "C,13,ARC_TR", "C,15,ARC_TL",
@@ -54,6 +54,7 @@ class GlyphLibraryTest {
 
     @ParameterizedTest
     @CsvSource({
+            "2,7,TRI_H_BR", "2,9,TRI_H_TL", "9,7,TRI_H_TR",
             "4,7,TRI_H_TR",
             "5,7,TRI_H_TR", "5,9,TRI_H_BL",
             "6,9,TRI_H_BL",
@@ -92,7 +93,7 @@ class GlyphLibraryTest {
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
                 CellShape.TRI_2V_TOP_R,
-                CellShape.NOTCH_DOWN,
+                CellShape.BLOCK,
                 CellShape.TRI_2V_TOP_L,
                 CellShape.TRI_2V_BOT_R, CellShape.BLOCK, CellShape.TRI_2V_BOT_L), glyph.cells());
     }
@@ -239,10 +240,11 @@ class GlyphLibraryTest {
         }
     }
 
-    @Test
-    void addedIUsesTheCenteredStroke() {
+    @ParameterizedTest
+    @CsvSource({"1", "I", "|"})
+    void oneAndIAndVerticalBarUseTheCenteredStroke(char character) {
         GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
-                .filter(candidate -> candidate.character() == 'I').findFirst().orElseThrow();
+                .filter(candidate -> candidate.character() == character).findFirst().orElseThrow();
         for (int i = 0; i < 15; i++) {
             assertEquals(i % 3 == 1 ? CellShape.BLOCK : CellShape.EMPTY, glyph.cells().get(i));
         }
@@ -260,5 +262,196 @@ class GlyphLibraryTest {
             assertEquals(CellShape.EMPTY, space.cells().get(i));
             assertEquals(i == 13 ? CellShape.BLOCK : CellShape.EMPTY, period.cells().get(i));
         }
+    }
+
+    @Test
+    void kUsesJoinedDiagonalArms() {
+        assertGlyph('K', List.of(
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.BLOCK, CellShape.TRI_H_BR, CellShape.TRI_H_TL,
+                CellShape.BLOCK, CellShape.NOTCH_UP, CellShape.TRI_H_BL,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK));
+    }
+
+    @Test
+    void qUsesAnInGridTail() {
+        assertGlyph('Q', List.of(
+                CellShape.ARC_BR, CellShape.BLOCK, CellShape.ARC_BL,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.ARC_TR, CellShape.BLOCK, CellShape.TRI_H_BR));
+    }
+
+    @Test
+    void xUsesBlocksAndOpposingNotches() {
+        assertGlyph('X', List.of(
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.NOTCH_RIGHT, CellShape.BLOCK, CellShape.NOTCH_LEFT,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.BLOCK));
+    }
+
+    @Test
+    void zUsesAConnectingDiagonalBetweenFullBars() {
+        assertGlyph('Z', List.of(
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.TRI_H_BR, CellShape.TRI_H_TL,
+                CellShape.TRI_H_BR, CellShape.TRI_H_TL, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK));
+    }
+
+    @Test
+    void plusUsesTheSpecifiedCrossCells() {
+        assertGlyph('+', List.of(
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY));
+    }
+
+    @Test
+    void equalsUsesFullBarsInRows2And4() {
+        assertGlyph('=', List.of(
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY));
+    }
+
+    @Test
+    void asteriskUsesARaisedCenterBlockAndOutwardNotches() {
+        assertGlyph('*', List.of(
+                CellShape.EMPTY, CellShape.NOTCH_DOWN, CellShape.EMPTY,
+                CellShape.NOTCH_RIGHT, CellShape.BLOCK, CellShape.NOTCH_LEFT,
+                CellShape.EMPTY, CellShape.NOTCH_UP, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY));
+    }
+
+    @Test
+    void semicolonMatchesColonWithATriangleInCell14() {
+        GlyphDefinition colon = GlyphLibrary.glyphs().stream()
+                .filter(glyph -> glyph.character() == ':').findFirst().orElseThrow();
+        var expected = new java.util.ArrayList<>(colon.cells());
+        expected.set(13, CellShape.TRI_H_TL);
+        assertGlyph(';', expected);
+    }
+
+    @Test
+    void commaUsesABlockInCell11AndATriangleInCell14() {
+        assertGlyph(',', List.of(
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.TRI_H_TL, CellShape.EMPTY));
+    }
+
+    @Test
+    void apostropheUsesCells2And5() {
+        assertGlyph('\'', List.of(
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.TRI_H_TR, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY));
+    }
+
+    @Test
+    void quotationMarkUsesCells2And3WithTrianglesBelow() {
+        assertGlyph('"', List.of(
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.TRI_H_TR, CellShape.TRI_H_TR,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY));
+    }
+
+    @Test
+    void underscoreUsesTheBottomRow() {
+        assertGlyph('_', List.of(
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK));
+    }
+
+    @Test
+    void exclamationMarkUsesBlocksInCells2And5And8And14() {
+        assertGlyph('!', List.of(
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY));
+    }
+
+    @Test
+    void questionMarkUsesRoundedTopCornersAndTrianglesInCells5And6() {
+        assertGlyph('?', List.of(
+                CellShape.ARC_BR, CellShape.BLOCK, CellShape.ARC_BL,
+                CellShape.EMPTY, CellShape.TRI_H_BR, CellShape.TRI_H_TL,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY));
+    }
+
+    @Test
+    void divisionSignUsesBlocksInCells2And7And8And9And14() {
+        assertGlyph('\u00F7', List.of(
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.BLOCK, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.EMPTY, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY));
+    }
+
+    @Test
+    void backslashIsTheHorizontalMirrorOfSlash() {
+        GlyphDefinition slash = GlyphLibrary.glyphs().stream()
+                .filter(glyph -> glyph.character() == '/').findFirst().orElseThrow();
+        var expected = new java.util.ArrayList<CellPattern>();
+        for (int row = 0; row < 5; row++) {
+            for (int column = 0; column < 3; column++) {
+                CellPattern original = slash.cells().get(row * 3 + 2 - column);
+                expected.add(switch (original) {
+                    case CellShape.EMPTY -> CellShape.EMPTY;
+                    case CellShape.TRI_H_BR -> CellShape.TRI_H_BL;
+                    case CellShape.TRI_H_TL -> CellShape.TRI_H_TR;
+                    default -> throw new AssertionError("Unexpected slash pattern: " + original);
+                });
+            }
+        }
+        assertGlyph('\\', expected);
+    }
+
+    @Test
+    void parenthesesUseMirroredRoundedEndsAndCenteredStems() {
+        assertGlyph('(', List.of(
+                CellShape.EMPTY, CellShape.ARC_BR, CellShape.BLOCK,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.ARC_TR, CellShape.BLOCK));
+        assertGlyph(')', List.of(
+                CellShape.BLOCK, CellShape.ARC_BL, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.EMPTY, CellShape.BLOCK, CellShape.EMPTY,
+                CellShape.BLOCK, CellShape.ARC_TL, CellShape.EMPTY));
+    }
+
+    private static void assertGlyph(char character, List<CellPattern> expected) {
+        GlyphDefinition glyph = GlyphLibrary.glyphs().stream()
+                .filter(candidate -> candidate.character() == character).findFirst().orElseThrow();
+        assertEquals(expected, glyph.cells());
+        assertEquals(String.format("U%04X.svg", (int) character), glyph.filename());
     }
 }
